@@ -31,15 +31,14 @@ Following example demonstrates the basic principle explained above:
 
  
 
-- .
-
 
 example:
-`
-	
+
+``` 
+objective-c
+
 – (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
- 
 	[[NSNotificationCenter defaultCenter]
 			addObserver:self selector:@selector(keyboardWillShow:)
 			name:UIKeyboardWillShowNotification object:nil];
@@ -47,58 +46,46 @@ example:
 			addObserver:self selector:@selector(keyboardWillHide:)
 			name:UIKeyboardWillHideNotification object:nil];
   } 
-
 -(void)viewDidDisappear:(BOOL)animated {
 	[super viewDidDisappear:animated];
- 
 	[[NSNotificationCenter defaultCenter]
 			removeObserver:self name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter]
 			removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
- 
 – (void)keyboardWillShow:(NSNotification*)notification {
 	[self adjustViewForKeyboardNotification:notification];
 }
- 
 – (void)keyboardWillHide:(NSNotification*)notification {
 	[self adjustViewForKeyboardNotification:notification];
 }
- 
 – (void)adjustViewForKeyboardNotification:(NSNotification *)notification {
-	NSDictionary *notificationInfo = [notification userInfo];
- 
+	NSDictionary *notificationInfo = [notification userInfo]; 
 	// Get the end frame of the keyboard in screen coordinates.
 	CGRect finalKeyboardFrame = [[notificationInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 	// Get the animation curve and duration
 	UIViewAnimationCurve animationCurve = (UIViewAnimationCurve) [[notificationInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] integerValue];
-	NSTimeInterval animationDuration = [[notificationInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
- 
+	NSTimeInterval animationDuration = [[notificationInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]; 
 	// Convert the finalKeyboardFrame to view coordinates to take into account any rotation
 	// factors applied to the window’s contents as a result of interface orientation changes.
-	finalKeyboardFrame = [self.view convertRect:finalKeyboardFrame fromView:self.view.window];
- 
+	finalKeyboardFrame = [self.view convertRect:finalKeyboardFrame fromView:self.view.window]; 
 	// Calculate new position of the commentBar
 	CGRect commentBarFrame = self.commentBar.frame;
-	commentBarFrame.origin.y = finalKeyboardFrame.origin.y - commentBarFrame.size.height;
- 
+	commentBarFrame.origin.y = finalKeyboardFrame.origin.y - commentBarFrame.size.height; 
 	// Update tableView height.
 	CGRect tableViewFrame = self.tableView.frame;
-	tableViewFrame.size.height = commentBarFrame.origin.y;
- 
+	tableViewFrame.size.height = commentBarFrame.origin.y; 
 	// Animate view size synchronously with the appearance of the keyboard. 
 	[UIView beginAnimations:nil context:nil];
 	[UIView setAnimationDuration:animationDuration];
 	[UIView setAnimationCurve:animationCurve];
-	[UIView setAnimationBeginsFromCurrentState:YES];
- 
+	[UIView setAnimationBeginsFromCurrentState:YES]; 
 	self.commentBar.frame = commentBarFrame;
-	self.tableView.frame = tableViewFrame;
- 
+	self.tableView.frame = tableViewFrame; 
 	[UIView commitAnimations];
 }
 
-`
+```
 
 `To solve this problem we need to make sure not to set up any animations whenever keyboard is dismissed or presented due to rotation of the interface orientation. Instead, we only need to update the position of appropriate views. For this purpose we can utilize following UIViewController methods:`
 
